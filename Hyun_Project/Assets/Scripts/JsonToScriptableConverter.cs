@@ -1,19 +1,42 @@
-
+ï»¿
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
+using Mono.Cecil;
+
+public enum ConversionType
+{
+    Items,
+    Dialogs
+}
+
+[Serializable]
+public class DialogRowData
+{
+    public int? id;     // int?ëŠ” Nullable<int>ì˜ ì¶•ì•½ í‘œí˜„
+    public string characterName;
+    public string text;
+    public int? nextId;
+    public string protraitPath;
+    public string choiceText;
+    public int? choiceNextId;
+}
+
 
 public class JsonToScriptableConverter : EditorWindow
 {
-    private string jsonFilePath = "";                                   // JSON ÆÄÀÏ °æ·Î ¹®ÀÚ¿­ °ª
-    private string outputFolder = "Assets/ScriptableObjects/Item";      // Ãâ·Â SO ÆÄÀÏ °æ·Î °ª
-    private bool createDatabase = true;                                 // µ¥ÀÌÅÍ º£ÀÌ½º È°¿ë ¿©ºÎ Ã¼Å© °ª
+    private string jsonFilePath = "";                                   // JSON íŒŒì¼ ê²½ë¡œ ë¬¸ìì—´ ê°’
+    private string outputFolder = "Assets/ScriptableObjects";               // ì¶œë ¥ SO íŒŒì¼ ê²½ë¡œ ê°’
+    private bool createDatabase = true;                                 // ë°ì´í„° ë² ì´ìŠ¤ í™œìš© ì—¬ë¶€ ì²´í¬ ê°’
+    private ConversionType conversionType = ConversionType.Items;
 
-    [MenuItem("Tools/JSON to Scriptable Object")]
 
+
+    [MenuItem("Tools/JSON to ScriptableObjects")]
     public static void ShowWindow()
     {
         GetWindow<JsonToScriptableConverter>("JSON to Scriptable Objects");
@@ -24,65 +47,89 @@ public class JsonToScriptableConverter : EditorWindow
         GUILayout.Label("JSON to Scriptable object Converter", EditorStyles.boldLabel);
         EditorGUILayout.Space();
 
-        if(GUILayout.Button("Select JSON File"))
+        if (GUILayout.Button("Select JSON File"))
         {
             jsonFilePath = EditorUtility.OpenFilePanel("Select JSON File", "", "json"); ;
         }
 
         EditorGUILayout.LabelField("Selected File : ", jsonFilePath);
         EditorGUILayout.Space();
+
+        // ë³€í™˜ íƒ€ì… ì„ íƒ
+        conversionType = (ConversionType)EditorGUILayout.EnumPopup("Conversion Type:", conversionType);
+        if (conversionType == ConversionType.Items && outputFolder == "Assets/scriptObjects")
+        {
+            outputFolder = "Assets/ScriptableObjects/Items";
+        }
+        else if (conversionType == ConversionType.Dialogs && outputFolder == "Assets/ScriptableObjects")
+        {
+            outputFolder = "Assets/ScriptableObjects/Dialog";
+        }
+
+
+
         outputFolder = EditorGUILayout.TextField("Output Foloder : ", outputFolder);
         createDatabase = EditorGUILayout.Toggle("Create Databse Asset", createDatabase);
         EditorGUILayout.Space();
 
-        if(GUILayout.Button("Convert to Scriptable Object"))
+        if (GUILayout.Button("Convert to Scriptable Object"))
         {
-            if(string.IsNullOrEmpty(jsonFilePath))
+            if (string.IsNullOrEmpty(jsonFilePath))
             {
                 EditorUtility.DisplayDialog("Error", "Pease Selct a JSON file first", "OK");
                 return;
             }
-            ConvertJsonToScriptableObjects();
+
+            switch (conversionType)
+            {
+                case ConversionType.Items:
+                    ConvertJsonToItemScriptableObjects();
+                    break;
+                case ConversionType.Dialogs:
+                    ConvertJsonToDialogScriptableObjects();
+                    break;
+            }
+            
         }
     }
 
 
-    private void ConvertJsonToScriptableObjects()       // JSON ÆÄÀÏÀ» ScriptableObject ÆÄÀÏ·Î º¯È¯ ½ÃÄÑÁÖ´Â ÇÔ¼ö
+    private void ConvertJsonToItemScriptableObjects()       // JSON íŒŒì¼ì„ ScriptableObject íŒŒì¼ë¡œ ë³€í™˜ ì‹œì¼œì£¼ëŠ” í•¨ìˆ˜
     {
-        // Æú´õ »ı¼º
-        if(!Directory.Exists(outputFolder))             // Æú´õ À§Ä¡¸¦ È®ÀÎÇÏ°í ¾÷À¸¸é »ı¼ºÇÑ´Ù.
+        // í´ë” ìƒì„±
+        if (!Directory.Exists(outputFolder))             // í´ë” ìœ„ì¹˜ë¥¼ í™•ì¸í•˜ê³  ì—…ìœ¼ë©´ ìƒì„±í•œë‹¤.
         {
             Directory.CreateDirectory(outputFolder);
         }
 
-        // JSON ÆÄÀÏ ÀĞ±â
-        string jsonText = File.ReadAllText(jsonFilePath);       // JSON ÆÄÀÏÀ» ÀĞ´Â´Ù.
+        // JSON íŒŒì¼ ì½ê¸°
+        string jsonText = File.ReadAllText(jsonFilePath);       // JSON íŒŒì¼ì„ ì½ëŠ”ë‹¤.
 
         try
         {
             List<ItemData> itemDataList = JsonConvert.DeserializeObject<List<ItemData>>(jsonText);
 
-            List<ItemSO> createdItems = new List<ItemSO>();     // ItemSO ¸®½ºÆ® »ı¼º
+            List<ItemSO> createdItems = new List<ItemSO>();     // ItemSO ë¦¬ìŠ¤íŠ¸ ìƒì„±
 
-            // °¢ ¾ÆÀÌÅÛÀ» Å×ÀÌÅÍ ½ºÅ©¸³ÅÍºí ¿ÀºêÁ§Æ®·Î º¯È¯
-            foreach(ItemData itemData in itemDataList)
+            // ê° ì•„ì´í…œì„ í…Œì´í„° ìŠ¤í¬ë¦½í„°ë¸” ì˜¤ë¸Œì íŠ¸ë¡œ ë³€í™˜
+            foreach (ItemData itemData in itemDataList)
             {
-                ItemSO itemSO = ScriptableObject.CreateInstance<ItemSO>();      //ItemSO ÆÄÀÏÀ» »ı¼º
+                ItemSO itemSO = ScriptableObject.CreateInstance<ItemSO>();      //ItemSO íŒŒì¼ì„ ìƒì„±
 
-                // µ¥ÀÌÅÍ º¹»ç
+                // ë°ì´í„° ë³µì‚¬
                 itemSO.id = itemData.id;
                 itemSO.itemName = itemData.itemName;
                 itemSO.nameEng = itemData.nameEng;
                 itemSO.description = itemData.description;
 
-                // ¿­°ÅÇü º¯È¯
-                if(System.Enum.TryParse(itemData.itemTypeString, out ItemType parsedType))
+                // ì—´ê±°í˜• ë³€í™˜
+                if (System.Enum.TryParse(itemData.itemTypeString, out ItemType parsedType))
                 {
-                    itemSO.itemType = parsedType;   
+                    itemSO.itemType = parsedType;
                 }
                 else
                 {
-                    Debug.LogWarning($"¾ÆÀÌÅÛ {itemData.itemName}ÀÇ À¯È¿ÇÏÁö ¾ÊÀº Å¸ÀÔ : {itemData.itemTypeString}");
+                    Debug.LogWarning($"ì•„ì´í…œ {itemData.itemName}ì˜ ìœ íš¨í•˜ì§€ ì•Šì€ íƒ€ì… : {itemData.itemTypeString}");
                 }
 
                 itemSO.price = itemData.price;
@@ -91,31 +138,31 @@ public class JsonToScriptableConverter : EditorWindow
                 itemSO.isStackable = itemData.isStackable;
 
 
-                //¾ÆÀÌÄÜ ·Îµå (°æ·Î°¡ ÀÖ´Â °æ¿ì)        //¾ÆÀÌÄÜ °æ·Î°¡ ÀÖ´ÂÁö È®ÀÎÇÑ´Ù.
-                if(!string.IsNullOrEmpty(itemData.iconPath))
+                //ì•„ì´ì½˜ ë¡œë“œ (ê²½ë¡œê°€ ìˆëŠ” ê²½ìš°)        //ì•„ì´ì½˜ ê²½ë¡œê°€ ìˆëŠ”ì§€ í™•ì¸í•œë‹¤.
+                if (!string.IsNullOrEmpty(itemData.iconPath))
                 {
                     itemSO.icon = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Resources/{itemData.iconPath}.png");
 
-                    if(itemSO.icon == null)
+                    if (itemSO.icon == null)
                     {
-                        Debug.LogWarning($"¾ÆÀÌÅÛ {itemData.nameEng} ÀÇ ¾ÆÀÌÄÜÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù. : {itemData.iconPath}");
+                        Debug.LogWarning($"ì•„ì´í…œ {itemData.nameEng} ì˜ ì•„ì´ì½˜ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. : {itemData.iconPath}");
                     }
                 }
 
-                // ½ºÅ©¸³ÅÍºí ¿ÀºêÁ§Æ® ÀúÀå - ID¸¦ 4°¡Áö ¼ıÀÚ·Î Æ÷¸ËÆÃ
+                // ìŠ¤í¬ë¦½í„°ë¸” ì˜¤ë¸Œì íŠ¸ ì €ì¥ - IDë¥¼ 4ê°€ì§€ ìˆ«ìë¡œ í¬ë§·íŒ…
                 string assetPath = $"{outputFolder}/Item_{itemData.id.ToString("D4")}_{itemData.nameEng}.asset";
-                AssetDatabase.CreateAsset(itemSO, assetPath );
+                AssetDatabase.CreateAsset(itemSO, assetPath);
 
 
-                // ¿¡¼Â ÀÌ¸§ ÁöÁ¤
+                // ì—ì…‹ ì´ë¦„ ì§€ì •
                 itemSO.name = $"Item_{itemData.id.ToString("D4")} + {itemData.nameEng}";
                 createdItems.Add(itemSO);
 
                 EditorUtility.SetDirty(itemSO);
             }
 
-            // µ¥ÀÌÅÍº£ÀÌ½º
-            if (createDatabase && createdItems.Count > 0)       // »ı¼º
+            // ë°ì´í„°ë² ì´ìŠ¤
+            if (createDatabase && createdItems.Count > 0)       // ìƒì„±
             {
                 ItemDataBaseSO dataBase = ScriptableObject.CreateInstance<ItemDataBaseSO>();
                 dataBase.items = createdItems;
@@ -130,11 +177,151 @@ public class JsonToScriptableConverter : EditorWindow
             EditorUtility.DisplayDialog("Sucess", $"Created {createdItems.Count} scriptable objects!", "OK"); ;
         }
 
-           
-        catch(System.Exception e)
+
+        catch (System.Exception e)
         {
             EditorUtility.DisplayDialog("Error", $"Failed to Convert JSON : {e.Message}", "OK");
-            Debug.LogError($"JSON º¯È¯ ¿À·ù : {e}");
+            Debug.LogError($"JSON ë³€í™˜ ì˜¤ë¥˜ : {e}");
+        }
+    }
+
+    private void ConvertJsonToDialogScriptableObjects()
+    {
+        // í´ë” ìƒì„±
+        if (!Directory.Exists(outputFolder))
+        {
+            Directory.CreateDirectory(outputFolder);
+        }
+
+        // JSON íŒŒì¼ ì½ê¸°
+        string JsonText = File.ReadAllText(jsonFilePath);
+
+        try
+        {
+            // JSON íŒŒì‹±
+            List<DialogRowData> rowDataList = JsonConvert.DeserializeObject<List<DialogRowData>>(JsonText);
+
+            // ëŒ€í™” ë°ì´í„° ì¬êµ¬ì„±
+            Dictionary<int,DialogSO> dialogMap = new Dictionary<int,DialogSO>();    
+            List<DialogSO> createDialogs = new List<DialogSO>();
+
+            // 1ë‹¨ê³„ : ëŒ€í™” í•­ëª© ìƒì„±
+
+            foreach(var rowData in rowDataList)
+            {
+                if (!rowData.id.HasValue) continue;     // id ì—†ëŠ” rowëŠ” ìŠ¤í‚µ
+
+
+                // if ìˆëŠ” í–‰ì„ ëŒ€í™”ë¡œ ì²˜ë¦¬
+                DialogSO dialogSO = ScriptableObject.CreateInstance<DialogSO>();
+                
+                // ë°ì´í„° ë³µì‚¬
+                dialogSO.id = rowData.id.Value;
+                dialogSO.characterName = rowData.characterName;
+                dialogSO.text = rowData.text;
+                dialogSO.nextId = rowData.nextId.HasValue ? rowData.nextId.Value : -1;
+                dialogSO.portraitPath = rowData.protraitPath;
+                dialogSO.choices = new List<DialogChoiceSO>();
+                // ì´ˆìƒí™” ë¡œë“œ (ê²½ë¡œê°€ ìˆì„ ê²½ìš°)
+                if(!string.IsNullOrEmpty(rowData.protraitPath))
+                {
+                    dialogSO.portrait = Resources.Load<Sprite>(rowData.protraitPath);
+
+                    if(dialogSO.portrait == null)
+                    {
+                        Debug.LogWarning($"ëŒ€í™” {rowData.id}ì˜ ì´ˆìƒí™”ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤");
+                    }
+
+                }
+                dialogMap[dialogSO.id] = dialogSO;
+                createDialogs.Add(dialogSO);
+
+
+
+
+            }
+
+
+            // 2ë‹¨ê³„ : ì„ íƒì§€ í•­ëª© ì²˜ë¦¬ ë° ì—°ê²°
+
+            foreach(var rowData in rowDataList)
+            {
+                // idê°€ ì—†ê³  choiseText ê°€ ìˆëŠ” í–‰ì€ ì„ íƒì§€ë¡œ ì²˜ë¦¬
+                if (!rowData.id.HasValue && !string.IsNullOrEmpty(rowData.choiceText) && rowData.choiceNextId.HasValue)
+                {
+                    // ì´ì „ í–‰ì˜ IDë¥¼ ë¶€ëª¨ IDë¡œ ì‚¬ìš© (ì—°ì†ë˜ëŠ” ì„ íƒì§€ì˜ ê²½ìš°)
+                    int parentId = -1;
+
+                    // ì´ ì„ íƒì§€ ë°”ë¡œ ìœ„ì— ìˆëŠ” ëŒ€í™”{idê°€ ìˆëŠ” í•­ëª©)ì„ ì°¾ìŒ
+                    int currentIndex = rowDataList.IndexOf(rowData);
+                    for (int i = currentIndex - 1; i >= 0; i--)
+                    {
+                        if (rowDataList[i].id.HasValue)
+                        {
+                            parentId = rowDataList[i].id.Value;
+                            break;
+                        }
+
+                    }
+
+                    // ë¶€ëª¨ IDë¥¼ ì°¾ì§€ ëª»í–ˆê±°ë‚˜ ë¶€ëª¨ Idê°€ -1ì¸ ê²½ìš° (ì²«ë²ˆì§¸ í•­ëª©)
+                    if (parentId == -1)
+                    {
+                        Debug.LogWarning($"ì„ íƒì§€ {rowData.choiceText} ì˜ ë¶€ëª¨ ëŒ€í™”ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+                    }
+
+                    if (dialogMap.TryGetValue(parentId, out DialogSO parentDialog))
+                    {
+                        DialogChoiceSO choiceSO = ScriptableObject.CreateInstance<DialogChoiceSO>();
+                        choiceSO.text = rowData.choiceText;
+                        choiceSO.nextId = rowData.choiceNextId.Value;
+
+                        // ì„ íƒì§€ ì—ì…‹ ì €ì¥
+                        string choiceAssetPath = $"{outputFolder}/Choice_{parentId}_{parentDialog.choices.Count + 1}.asset";
+                        AssetDatabase.CreateAsset(choiceSO, choiceAssetPath);
+                        EditorUtility.SetDirty(choiceSO);
+                        parentDialog.choices.Add(choiceSO);
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"ì„ íƒì§€ {rowData.choiceText}ë¥¼ ì—°ê²°í•  ëŒ€í™” (ID : {parentId}ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤");
+                    }
+                }
+            }
+
+            // 3ë‹¨ê³„ : ëŒ€í™” ìŠ¤í¬ë¦½í„°ë¸” ì˜¤ë¸Œì íŠ¸ ì €ì¥
+
+            foreach(var dialog in createDialogs)
+            {
+                // ìŠ¤í¬ë¦½í„°ë¸” ì˜¤ë¸Œì íŠ¸ ì €ì¥ = ID 4ìë¦¬ ìˆ«ì
+                string assetPath = $"{outputFolder}/Dialog {dialog.id.ToString("D4")}.asset";
+                AssetDatabase.CreateAsset(dialog, assetPath);
+
+                // ì—ì…‹ ì´ë¦„ ì €ì¥
+                dialog.name = $"Dialog_{dialog.id.ToString("D4")}";
+
+                EditorUtility.SetDirty (dialog);
+            }
+            // ë°ì´í„° ë² ì´ìŠ¤ ìƒì„±
+            if(createDatabase && createDialogs.Count > 0)
+            {
+                DialogDatabaseSO database = ScriptableObject.CreateInstance<DialogDatabaseSO>();
+                database.dialogs = createDialogs;
+
+                AssetDatabase.CreateAsset(database, $"{outputFolder}/DialogDatabase.assets");
+                EditorUtility.SetDirty(database);
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtility.DisplayDialog("Success", $"created {createDialogs.Count} dialog scriptable object!", "OK");
+        }
+        catch (System.Exception e)
+        {
+            {
+                EditorUtility.DisplayDialog("Error", $"Faild to convert JSON : {e.Message}", "OK");
+                Debug.LogError($"JSON ë³€í™˜ ì˜¤ë¥˜ : {e}");
+            }
         }
     }
 }

@@ -1,0 +1,17 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "DialogSO", menuName = "Dailog System/DialogSO")]
+public class DialogSO : ScriptableObject
+{
+    public int id;
+    public string characterName;
+    public string text;
+    public int nextId;
+    public Sprite portrait;
+
+    public List<DialogChoiceSO> choices = new List<DialogChoiceSO>();
+
+
+    public string portraitPath;
+}
