@@ -18,8 +18,8 @@ MonoBehaviour:
     \uB098\uD0C0\uB0A9\uB2C8\uB2E4! \uC870\uC2EC\uD558\uC9C0 \uC54A\uC73C\uBA74 \uBE60\uC9C8
     \uAC83 \uAC19\uC2B5\uB2C8\uB2E4."
   nextId: -1
-  portrait: {fileID: 0}
   choices:
-  - {fileID: 11400000, guid: da3c10e62ce569e49b02eaa601031671, type: 2}
-  - {fileID: 11400000, guid: 809a5b94b82453249bafd705075604ab, type: 2}
-  portraitPath: 
+  - {fileID: 11400000, guid: a9ac526d6b5f79b449592f3e0db3ff3b, type: 2}
+  - {fileID: 11400000, guid: aad713f174df2724d8361489703c4357, type: 2}
+  portrait: {fileID: 0}
+  portraitPath: Characters/Explorer

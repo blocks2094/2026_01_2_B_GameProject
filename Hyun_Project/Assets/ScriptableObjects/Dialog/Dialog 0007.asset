@@ -18,6 +18,6 @@ MonoBehaviour:
     \uADF8\uB7EC\uBA74 \uC232\uC744 \uBE60\uC838\uB098\uAC08 \uC218 \uC788\uB294
     \uC9C0\uB3C4\uB97C \uC8FC\uACA0\uB124."
   nextId: 20
-  portrait: {fileID: 0}
   choices: []
-  portraitPath: 
+  portrait: {fileID: 0}
+  portraitPath: Characters/OldMan

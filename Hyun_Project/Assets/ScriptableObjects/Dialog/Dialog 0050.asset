@@ -17,6 +17,6 @@ MonoBehaviour:
   text: "\uAD6C\uB369\uC774\uB97C \uB6F0\uC5B4\uB118\uC73C\uB824 \uD588\uC9C0\uB9CC
     \uAC70\uB9AC\uAC00 \uC0DD\uAC01\uBCF4\uB2E4 \uBA40\uC5C8\uC2B5\uB2C8\uB2E4!"
   nextId: 51
-  portrait: {fileID: 0}
   choices: []
-  portraitPath: 
+  portrait: {fileID: 0}
+  portraitPath: Characters/Explorer

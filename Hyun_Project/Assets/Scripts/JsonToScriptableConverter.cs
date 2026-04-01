@@ -21,7 +21,7 @@ public class DialogRowData
     public string characterName;
     public string text;
     public int? nextId;
-    public string protraitPath;
+    public string portraitPath;
     public string choiceText;
     public int? choiceNextId;
 }
@@ -220,12 +220,12 @@ public class JsonToScriptableConverter : EditorWindow
                 dialogSO.characterName = rowData.characterName;
                 dialogSO.text = rowData.text;
                 dialogSO.nextId = rowData.nextId.HasValue ? rowData.nextId.Value : -1;
-                dialogSO.portraitPath = rowData.protraitPath;
+                dialogSO.portraitPath = rowData.portraitPath;
                 dialogSO.choices = new List<DialogChoiceSO>();
                 // 초상화 로드 (경로가 있을 경우)
-                if(!string.IsNullOrEmpty(rowData.protraitPath))
+                if(!string.IsNullOrEmpty(rowData.portraitPath))
                 {
-                    dialogSO.portrait = Resources.Load<Sprite>(rowData.protraitPath);
+                    dialogSO.portrait = Resources.Load<Sprite>(rowData.portraitPath);
 
                     if(dialogSO.portrait == null)
                     {
@@ -314,7 +314,7 @@ public class JsonToScriptableConverter : EditorWindow
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            EditorUtility.DisplayDialog("Success", $"created {createDialogs.Count} dialog scriptable object!", "OK");
+            EditorUtility.DisplayDialog("Success", $"created {createDialogs.Count} dialog scriptable objects!", "OK");
         }
         catch (System.Exception e)
         {

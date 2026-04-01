@@ -18,6 +18,6 @@ MonoBehaviour:
     \uBCF4\uC785\uB2C8\uB2E4. \uC774\uAC78\uB85C \uBB3C\uC744 \uB2F4\uC744 \uC218
     \uC788\uC744\uAE4C\uC694?"
   nextId: 42
-  portrait: {fileID: 0}
   choices: []
-  portraitPath: 
+  portrait: {fileID: 0}
+  portraitPath: Characters/Explorer

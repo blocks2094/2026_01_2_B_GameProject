@@ -16,8 +16,8 @@ MonoBehaviour:
   characterName: "\uB0B4\uB808\uC774\uD130"
   text: "\uC5B4\uB290 \uAE38\uB85C \uAC00\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
   nextId: -1
-  portrait: {fileID: 0}
   choices:
-  - {fileID: 11400000, guid: 8853441445de1924dbe60113067c5c60, type: 2}
-  - {fileID: 11400000, guid: c029c17c11567d04d93f09a7bdc0165b, type: 2}
-  portraitPath: 
+  - {fileID: 11400000, guid: 013a046b264c1d141b0490a96d194b5e, type: 2}
+  - {fileID: 11400000, guid: d0ad4e0e662014640894d0fa77a2fe92, type: 2}
+  portrait: {fileID: 0}
+  portraitPath: Characters/Narrator

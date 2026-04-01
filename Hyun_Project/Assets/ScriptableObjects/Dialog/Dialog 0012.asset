@@ -17,8 +17,8 @@ MonoBehaviour:
   text: "\uC548\uB155\uD558\uC138\uC694, \uC5EC\uD589\uC790\uB2D8! \uD639\uC2DC \uBB3C\uAC74\uC744
     \uAD6C\uACBD\uD558\uC2DC\uACA0\uC5B4\uC694?"
   nextId: -1
-  portrait: {fileID: 0}
   choices:
-  - {fileID: 11400000, guid: a2950bf8b4a65e647a6fa0df7ff8eedd, type: 2}
-  - {fileID: 11400000, guid: 02c78587124927c4489a0a07c232d76c, type: 2}
-  portraitPath: 
+  - {fileID: 11400000, guid: 0c5fe01db2bfa244cb296d2953c5f7c0, type: 2}
+  - {fileID: 11400000, guid: 965f71658901af443bbf68501fcc0ad3, type: 2}
+  portrait: {fileID: 0}
+  portraitPath: Characters/Merchant

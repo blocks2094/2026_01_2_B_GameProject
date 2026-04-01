@@ -17,6 +17,6 @@ MonoBehaviour:
   text: "\uC232\uC774 \uC810\uC810 \uBC1D\uC544\uC9C0\uB354\uB2C8 \uB9C8\uCE68\uB0B4
     \uCD9C\uAD6C\uAC00 \uBCF4\uC785\uB2C8\uB2E4!"
   nextId: 39
-  portrait: {fileID: 0}
   choices: []
-  portraitPath: 
+  portrait: {fileID: 0}
+  portraitPath: Characters/Explorer

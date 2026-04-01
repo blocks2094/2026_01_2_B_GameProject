@@ -17,8 +17,8 @@ MonoBehaviour:
   text: "\uC8FC\uBCC0\uC744 \uC0B4\uD3B4\uBCF4\uB2C8 \uC624\uB798\uB41C \uBB3C\uBCD1\uC774
     \uC788\uC2B5\uB2C8\uB2E4. \uC5B4\uB5BB\uAC8C \uD558\uC2DC\uACA0\uC2B5\uB2C8\uAE4C?"
   nextId: -1
-  portrait: {fileID: 0}
   choices:
-  - {fileID: 11400000, guid: 8f283ea8c85839247ae4eb7fd34af222, type: 2}
-  - {fileID: 11400000, guid: 579ceab7cd25a0f44b2f254f537b3ae3, type: 2}
-  portraitPath: 
+  - {fileID: 11400000, guid: 557aeb665ccf0e7478aee9263c933576, type: 2}
+  - {fileID: 11400000, guid: 7aed0f09de8e10348bb69871dd80c398, type: 2}
+  portrait: {fileID: 0}
+  portraitPath: Characters/Explorer

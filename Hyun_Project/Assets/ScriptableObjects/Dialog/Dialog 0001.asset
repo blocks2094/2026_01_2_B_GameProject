@@ -17,6 +17,6 @@ MonoBehaviour:
   text: "\uB2F9\uC2E0\uC740 \uAE4A\uC740 \uC232\uC18D\uC5D0\uC11C \uAE38\uC744 \uC783\uC5C8\uC2B5\uB2C8\uB2E4.
     \uC55E\uC5D0\uB294 \uB450 \uAC08\uB798 \uAE38\uC774 \uC788\uC2B5\uB2C8\uB2E4."
   nextId: 2
-  portrait: {fileID: 0}
   choices: []
-  portraitPath: 
+  portrait: {fileID: 0}
+  portraitPath: Characters/Narrator
