@@ -193,14 +193,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eae2e47db0fc4164fade08ec39429ec0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogManager
-  dialogDatabase: {fileID: 0}
-  dialogPener: {fileID: 1547991378}
+  dialogDatabase: {fileID: 11400000, guid: 310385393f691c9459c0ade8f4539b89, type: 2}
+  dialogPanel: {fileID: 1547991378}
   portraitImage: {fileID: 1025286761}
   characterNameText: {fileID: 1065279021}
   dialogText: {fileID: 1824305470}
   NextButton: {fileID: 955907595}
   typingSpeed: 0.05
-  useTyperriterEffect: 1
+  useTypewriterEffect: 1
 --- !u!4 &326613791
 Transform:
   m_ObjectHideFlags: 0
