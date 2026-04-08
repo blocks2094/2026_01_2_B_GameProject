@@ -1,44 +1,41 @@
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
 using System.Collections;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+using static UnityEditor.Rendering.MaterialUpgrader;
 
 public class DialogManager : MonoBehaviour
 {
-   public static DialogManager Instance {  get; private set; }
+    public static DialogManager Instance { get; private set; }
 
-    [Header("Dialog Reterences")]
+    [Header("Dialog References")]
     [SerializeField] private DialogDatabaseSO dialogDatabase;
 
     [Header("UI References")]
-    [SerializeField] private GameObject dialogPener;
+    [SerializeField] private GameObject dialogPanel;
 
-    [SerializeField] private Image portraitImage;   // Ä³¸¯ÅÍ ÃÊ»óÈ­ ÀÌ¹ÌÁö Ãß°¡
-    
 
+    [SerializeField] private Image portraitImage;                               //ìºë¦­í„° ì´ˆìƒí™” ì´ë¯¸ì§€ UI ìš”ì†Œ ì¶”ê°€ 
 
     [SerializeField] private TextMeshProUGUI characterNameText;
     [SerializeField] private TextMeshProUGUI dialogText;
     [SerializeField] private Button NextButton;
 
-    [Header("Dialog Setting")]
+    [Header("Dialog Settings")]
     [SerializeField] private float typingSpeed = 0.05f;
-    [SerializeField] private bool useTyperriterEffect = true;
+    [SerializeField] private bool useTypewriterEffect = true;
 
     private bool isTyping = false;
-    private Coroutine typingCoroutine;
-    
+    private Coroutine typingCoroutine;                              //ì½”ë£¨í‹´ ì„ ì–¸
 
     private DialogSO currentDialog;
 
-
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);  
-
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -46,18 +43,18 @@ public class DialogManager : MonoBehaviour
             return;
         }
 
-        if(dialogDatabase == null)
+        if (dialogDatabase != null)
         {
-            dialogDatabase.Initailize();    // ÃÊ±âÈ­
+            dialogDatabase.Initailize();                    //ì´ˆê¸°í™”
         }
         else
         {
-            Debug.LogError("Dialog Database is noot assinged to Dialgo Manager");
+            Debug.LogError("Dialog Database is not assinged to Dialog Manager");
         }
 
-        if(NextButton != null)
+        if (NextButton != null)
         {
-            //NextButton.onClick.AddListener(NextDialog);       // ¹öÆ° ¸®½º³Ê µî·Ï
+            NextButton.onClick.AddListener(NextDialog);                   //ë²„íŠ¼ ë¦¬ìŠ¤ë„ˆ ë“±ë¡ 
         }
         else
         {
@@ -65,78 +62,81 @@ public class DialogManager : MonoBehaviour
         }
     }
 
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        // UI ÃÊ±âÈ­ ÈÄ ´ëÈ­ ½ÃÀÛ (ID 1)
+        //UIì´ˆê¸°í™” í›„ ëŒ€í™” ì‹œì‘ (ID 1)
         CloseDialog();
-        StartDialog(1); // ÀÚµ¿À¸·Î Ã¹¹øÂ° ´ëÈ­ ½ÃÀÛ
+        StartDialog(1);                         //ìë™ìœ¼ë¡œ ì²« ë²ˆì§¸ ëŒ€í™” ì‹œì‘
     }
 
-    
+    // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    // ID·Î ´ëÈ­ ½ÃÀÛ
+    //IDë¡œ ëŒ€í™” ì‹œì‘
     public void StartDialog(int dialogId)
     {
-        DialogSO dialog = dialogDatabase.GetDialogByld(dialogId);
-        if(dialog != null)
+        DialogSO dialog = dialogDatabase.GetDialongById(dialogId);
+        if (dialog != null)
         {
             StartDialog(dialog);
         }
         else
         {
-            Debug.LogError($"Dialog with ID {dialogId} not found");
+            Debug.LogError($"Dialog with ID {dialogId} not found!");
         }
     }
 
-    // Dialog·Î ´ëÈ­ ½ÃÀÛ
+    //DialogSOë¡œ ëŒ€í™” ì‹œì‘
     public void StartDialog(DialogSO dialog)
     {
         if (dialog == null) return;
 
         currentDialog = dialog;
         ShowDialog();
-        dialogPener.SetActive(true);
+        dialogPanel.SetActive(true);
     }
 
     public void ShowDialog()
     {
-        if (currentDialog == null) return;
-        characterNameText.text = currentDialog.characterName;   // Ä³¸¯ÅÍ ÀÌ¸§ ¼³Á¤
-        
+        Debug.Log(currentDialog.portraitPath);
 
-        if (useTyperriterEffect)
+        if (currentDialog == null) return;
+        characterNameText.text = currentDialog.characterName;               //ìºë¦­í„° ì´ë¦„ ì„¤ì •
+
+        if (useTypewriterEffect)                                                 //ëŒ€í™” í…ìŠ¤íŠ¸ ì„¤ì • ë¶€ë¶„ ìˆ˜ì • 
         {
             StartTypingEffect(currentDialog.text);
         }
         else
         {
-            dialogText.text = currentDialog.text;   
+            dialogText.text = currentDialog.text;                               //ëŒ€í™” í…ìŠ¤íŠ¸ ì„¤ì •
         }
 
-            
 
-        // ÃÊ»óÈ­ ¼³Á¤
-        if(currentDialog.portrait != null)
+        //ì´ˆìƒí™” ì„¤ì • (ìƒˆë¡œ ì¶”ê°€ëœ ë¶€ë¶„)
+        if (currentDialog.portrait != null)
         {
             portraitImage.sprite = currentDialog.portrait;
             portraitImage.gameObject.SetActive(true);
         }
-        else if(!string.IsNullOrEmpty(currentDialog.portraitPath)) 
+        else if (!string.IsNullOrEmpty(currentDialog.portraitPath))
         {
-            // Resources Æú´õ¿¡¼­ ÀÌ¹ÌÁö ·Îµå
+            //Resources í´ë”ì—ì„œ ì´ë¯¸ì§€ ë¡œë“œ (Assets/Resources/Characters/Narrator.png) ì˜ˆì‹œ ì´ë¯¸ì§€ ê²½ë¡œ            
             Sprite portrait = Resources.Load<Sprite>(currentDialog.portraitPath);
-            if(portrait != null)
+
+            if (portrait != null)
             {
                 portraitImage.sprite = portrait;
-                portraitImage.gameObject.SetActive(true);   
+                portraitImage.gameObject.SetActive(true);
             }
             else
             {
-                Debug.LogWarning($"Portait not found at path : {currentDialog.portraitPath}");
+                Debug.LogWarning($"Portrait not found at path : {currentDialog.portraitPath}");
                 portraitImage.gameObject.SetActive(false);
             }
         }
@@ -145,17 +145,16 @@ public class DialogManager : MonoBehaviour
             portraitImage.gameObject.SetActive(false);
         }
     }
-
-    public void CloseDialog()   // ´ëÈ­ Á¾·á
+    public void CloseDialog()                                               //ëŒ€í™” ì¢…ë£Œ
     {
-        dialogPener.SetActive(false);
+        dialogPanel.SetActive(false);
         currentDialog = null;
-        StopTypingEffect();     // Å¸ÀÌÇÎ È¿°ú ÁßÁö
+        StopTypingEffect();                                 //íƒ€ì´í•‘ íš¨ê³¼ ì¤‘ì§€ ì¶”ê°€ 
     }
 
     public void NextDialog()
     {
-        if(isTyping)    // Å¸ÀÌÇÎ ÁßÀÌ¸é Å¸ÀÌÇÎ ¿Ï·á Ã³¸®
+        if (isTyping)                                    //íƒ€ì´í•‘ ì¤‘ì´ë©´ íƒ€ì´í•‘ ì™„ë£Œ ì²˜ë¦¬ 
         {
             StopTypingEffect();
             dialogText.text = currentDialog.text;
@@ -163,9 +162,9 @@ public class DialogManager : MonoBehaviour
             return;
         }
 
-        if(currentDialog != null && currentDialog.nextId > 0)
+        if (currentDialog != null && currentDialog.nextId > 0)
         {
-            DialogSO nextDialog = dialogDatabase.GetDialogByld(currentDialog.nextId);
+            DialogSO nextDialog = dialogDatabase.GetDialongById(currentDialog.nextId);
             if (nextDialog != null)
             {
                 currentDialog = nextDialog;
@@ -182,12 +181,11 @@ public class DialogManager : MonoBehaviour
         }
     }
 
-
-    // ÅØ½ºÆ® Å¸ÀÌÇÎ
-    private IEnumerator TypeText(string type)
+    //í…ìŠ¤íŠ¸ íƒ€ì´í•‘ íš¨ê³¼ ì½”ë£¨í‹´
+    private IEnumerator TypeText(string text)
     {
         dialogText.text = "";
-        foreach(char c in type)
+        foreach (char c in text)
         {
             dialogText.text += c;
             yield return new WaitForSeconds(typingSpeed);
@@ -197,18 +195,18 @@ public class DialogManager : MonoBehaviour
 
     private void StopTypingEffect()
     {
-        if(typingCoroutine != null)
+        if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
             typingCoroutine = null;
         }
     }
 
-    // Å¸ÀÌÇÎ È¿°ú ÇÔ¼ö ½ÃÀÛ
+    //íƒ€ì´í•‘ íš¨ê³¼ í•¨ìˆ˜ ì‹œì‘
     private void StartTypingEffect(string text)
     {
         isTyping = true;
-        if(typingCoroutine != null)
+        if (typingCoroutine != null)
         {
             StopCoroutine(typingCoroutine);
         }
