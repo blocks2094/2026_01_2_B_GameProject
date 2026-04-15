@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ItemSO", menuName = "Inventory/ItemSO")]
@@ -14,11 +14,11 @@ public class ItemSO : ScriptableObject
     public int power;
     public int level;
     public bool isStackable;
-    public Sprite icon;     // ½ÇÁ¦·Î »ç¿ëÇÒ ½ºÇÁ¶óÀÌÆ® ¼±¾ğ
+    public Sprite icon;     // ì‹¤ì œë¡œ ì‚¬ìš©í•  ìŠ¤í”„ë¼ì´íŠ¸ ì„ ì–¸
 
     public override string ToString()
     {
-        return $"[{id}] {itemName} ({itemType}) - °¡°İ : {price} °ñµå, ¼Ó¼º : {power}";
+        return $"[{id}] {itemName} ({itemType}) - ê°€ê²© : {price} ê³¨ë“œ, ì†ì„± : {power}";
     }
 
     public string DisplayName

@@ -1,19 +1,19 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "ItemDataBaseSo", menuName = "Inventory/DataBase")]
 public class ItemDataBaseSO : ScriptableObject
 {
-    public List<ItemSO> items = new List<ItemSO>();     // ItemSO ¸®½ºÆ®·Î °ü¸®
+    public List<ItemSO> items = new List<ItemSO>();     // ItemSO ë¦¬ìŠ¤íŠ¸ë¡œ ê´€ë¦¬
     
-    // Ä³½ÌÀ» À§ÇÑ Dictrionary
-    private Dictionary<int, ItemSO> itemsByld;          // ID·Î ¾ÆÀÌÅÛ Ã£±â À§ÇÑ Ä³½Ì
-    private Dictionary<string, ItemSO> itemsByName;     // ÀÌ¸§À¸·Î ¾ÆÀÌÅÛ Ã£±â
+    // ìºì‹±ì„ ìœ„í•œ Dictrionary
+    private Dictionary<int, ItemSO> itemsByld;          // IDë¡œ ì•„ì´í…œ ì°¾ê¸° ìœ„í•œ ìºì‹±
+    private Dictionary<string, ItemSO> itemsByName;     // ì´ë¦„ìœ¼ë¡œ ì•„ì´í…œ ì°¾ê¸°
 
     public void Initialze()
     {
-        itemsByld = new Dictionary<int, ItemSO>();      // À§¿¡ ¼±¾ğ¸¸ Çß±â ¶§¹®¿¡ Dictionary ÇÒ´ç
+        itemsByld = new Dictionary<int, ItemSO>();      // ìœ„ì— ì„ ì–¸ë§Œ í–ˆê¸° ë•Œë¬¸ì— Dictionary í• ë‹¹
         itemsByName = new Dictionary<string, ItemSO>();
 
         foreach(var item in items)
@@ -23,27 +23,27 @@ public class ItemDataBaseSO : ScriptableObject
         }
     }
     
-    // ID·Î ¾ÆÀÌÅÛ Ã£±â
+    // IDë¡œ ì•„ì´í…œ ì°¾ê¸°
     public ItemSO GetItemByld(int id)
     {
         if(itemsByld == null)
         {
-            Initialze();        // Ä³½ÌÀÌ µÇ¾îÀÖ´ÂÁö È®ÀÎÇÏ°í ¾Æ´Ï¸é ÃÊ±âÈ­ ÇÑ´Ù.         
+            Initialze();        // ìºì‹±ì´ ë˜ì–´ìˆëŠ”ì§€ í™•ì¸í•˜ê³  ì•„ë‹ˆë©´ ì´ˆê¸°í™” í•œë‹¤.         
         }
         if (itemsByld.TryGetValue(id, out ItemSO item)) return item;
         return null;    
         
     }
 
-    // ÀÌ¸§À¸·Î ¾ÆÀÌÅÛ Ã£±â
+    // ì´ë¦„ìœ¼ë¡œ ì•„ì´í…œ ì°¾ê¸°
     public ItemSO GetItemByName(string name)
     {
         if(itemsByName == null)
         {
-            Initialze();    // Ä³½ÌÀÌ µÇ¾îÀÖ´ÂÁö È®ÀÎÇÏ°í ¾Æ´Ï¸é ÃÊ±âÈ­ ÇÑ´Ù
+            Initialze();    // ìºì‹±ì´ ë˜ì–´ìˆëŠ”ì§€ í™•ì¸í•˜ê³  ì•„ë‹ˆë©´ ì´ˆê¸°í™” í•œë‹¤
         }
 
-        if (itemsByName.TryGetValue(name, out ItemSO item)) return item;        // Name °ªÀ» Ã£¾Æ¼­ ItemSO ¸®ÅÏÇÑ´Ù.
+        if (itemsByName.TryGetValue(name, out ItemSO item)) return item;        // Name ê°’ì„ ì°¾ì•„ì„œ ItemSO ë¦¬í„´í•œë‹¤.
         return null;
     }
 
